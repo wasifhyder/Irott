@@ -3,11 +3,14 @@
 # analysis.
 
 import nltk
+from collections import Counter
 from nltk import word_tokenize
 from nltk.corpus import wordnet as wn
 
+
 if __name__ == "__main__":
-    nltk.download()
     with open("essay.txt", "r", encoding="utf-8") as essay:
-        tokens = \
-            word_tokenize(" ".join(essay.readlines()))
+        #nltk.download()
+        tokens = word_tokenize(" ".join(essay.readlines()))
+        count = Counter(tokens)
+        print(count)
