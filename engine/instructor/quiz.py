@@ -3,7 +3,7 @@ from nltk.corpus import wordnet as wn
 from domain.test_student_model import student_model
 from domain.wordnetapi import Word
 from domain.word_frequency import get_similar_frequency_words
-
+from domain.test_domain_model import load_word_list
 """
 The best way to design would be to talk things out. Right now, I'm trying to
 create a quizzing engine. The quizzing engine supports the asking
@@ -62,7 +62,7 @@ def generate_definition_question(word, prompt="What's the meaning of the word {}
                 word
     """
     # Return a list of definitions
-    definitions = Word(word).definitions
+    definitions = Word(word).senses
     # Filter out the definitions that contain the target word
     definition = [definition for definition in definitions if word not in definition.definition]
     # Generate Question
@@ -110,10 +110,11 @@ class Question:
 
 
 if __name__ == "__main__":
-    for word in ["sex", "real", "respiration"]:
+    word_list = load_word_list()
+    for word in random.sample(word_list, 10):
         try:
             generate_definition_question(word).ask()
         except Exception:
-            print("Couldn't generate question")
+            print("Couldn't generate question for the word {}".format(word))
 
 

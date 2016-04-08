@@ -1,7 +1,14 @@
 import pickle
 from wordnetapi import Word
+from collections import namedtuple
 
-domain_model = pickle.load(open("vocab_cefr_list.p", "rb"))
+def load_word_list():
+    word_list = pickle.load(open("vocab_cefr_list.p", "rb"))
+    return word_list.keys()
+
+def load_word_cefr_list():
+    word_cefr_list = pickle.load(open("vocab_cefr_list.p", "rb"))
+    return word_cefr_list
 
 # old
 # def word_def_syn(word):
@@ -14,18 +21,21 @@ domain_model = pickle.load(open("vocab_cefr_list.p", "rb"))
 #             for synonym in definition.synonyms:
 #                 print(synonym)
 
-# new
-def word_def_syn(word):
-    if word in domain_model:
-        word = Word(word, domain_model[word])
-        print(word, word.definitions)
+# Don't know what this is for. Most likely, to print word and its definitions
+# def word_def_syn(word):
+#     if word in word_list:
+#         word = Word(word, word_list[word])
+#         print(word, word.definitions)
 
 if __name__ == "__main__":
-    i = 0
-    for word in sorted(domain_model.keys()):
-        if i > 25: break
-        i += 1
-        #word = Word(word, cefr=domain_model[word])
-        print(word)
-        #print("{} {}".format(word, word.definitions))
-    # word_def_syn()
+    word_cefr_list = load_word_cefr_list()
+    word_list = load_word_list()
+
+    Word = namedtuple('Word', ['word', 'cefr'])
+    word_list_tuple = [Word(k,v) for k,v in word_cefr_list.items()]
+
+    t = [(k,v) for k, v in word_cefr_list.items()]
+
+    for item in filter(lambda x: x.cefr=="C1", word_list_tuple):
+        print(item.word, item.cefr)
+

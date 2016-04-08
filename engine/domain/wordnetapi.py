@@ -4,43 +4,73 @@ class Word:
     def __init__(self, word, cefr="UN"):
         self.word = word
         self.cefr = cefr
-        self.definitions = [Definition(sense) for sense in wn.synsets(self.word)]
+        self.senses = [Sense(sense) for sense in wn.synsets(self.word)]
 
-        # if data:
-        #     for definition_data in data:
-        #         self.definitions.append(Definition(definition_data))
 
     def __repr__(self):
         return "<Word: {:12}>".format(self.word)
 
-class Definition:
+class Sense:
     def __init__(self, sense):
-        self.partOfSpeech = sense.pos()
+        self.word = sense.name().split('.')[0]
+        self.sense = sense
+        self.wordnet_name = sense.name()
+        self.pos = sense.pos()
         self.definition = sense.definition()
-        self.examples = sense.definition()
-        self.synonyms = synonyms(sense)
-        self.antonyms = antonyms(sense)
-        self.hyperym = sense.hypernyms()
-        self.homonym = sense.hyponyms()
+        self.examples = sense.examples()
+
+        self.synonyms = self.get_synonyms()
+        self.antonyms = self.get_antonyms()
+        self.hypernyms = []
+        self.homonyms = []
+        self.frequency = []
 
     def __repr__(self):
-        return "{}".format(self.definition)
+        return "{}".format(self.wordnet_name)
 
-def antonyms(sense):
-    result = []
-    for lemma in sense.lemmas():
-        ants = lemma.antonyms()
-        for ant in ants:
-            result.append(ant.synset())
-        # for ant in ants:
-        #     result += ant.name()
-    return result
+    def list_everything(self):
+        print("Name: {}\n"
+              "POS: {}\n"
+              "Definition: {}\n"
+              "Examples: {}\n"
+              "Synonyms: {}\n"
+              "Antonyms: {}\n"
+              "Hypernym: {}\n"
+              "Homonyms: {}"
+            .format(
+            self.wordnet_name,
+            self.pos,
+            self.definition,
+            self.examples,
+            self.synonyms,
+            self.antonyms,
+            self.hypernyms,
+            self.homonyms,
+        ))
+        # print("Lemmas: {}\n".format([Sense(l) for l in self.sense.lemmas()]))
 
-def synonyms(sense):
-    result = []
-    for lemma in sense.lemmas():
-        result.append(lemma.synset())
-    return result
+    def get_synonyms(self):
+        """ Tried very hard to embed synset information
+            However, the lemmas don't have an associated synset information to save
+        """
+        result = []
+        # Find the original synset from which this sense came
+        wordnet_sense = next(x for x in wn.synsets(self.word) if x.name() == self.wordnet_name)
+        for lemma in wordnet_sense.lemmas():
+            result.append(lemma.name())
+        result.remove(self.word)
+        return result
+
+    def get_antonyms(self):
+        result = []
+        # Find the original synset from which this sense came
+        wordnet_sense = next(x for x in wn.synsets(self.word) if x.name() == self.wordnet_name)
+        for lemma in wordnet_sense.lemmas():
+            result += (x.name() for x in lemma.antonyms())
+        # result.remove(self.word)
+        return result
+
+
 
 
 if __name__ == "__main__":
@@ -48,8 +78,12 @@ if __name__ == "__main__":
     # rage.get_info_from_wordsapi()
     # print(rage.definitions)
     # pass
-    w = Word("rage")
-    print(w.definitions)
+    # w = Word("rage")
+    from nltk.corpus import wordnet as wn
+    w = Word("calm")
+    for sense in w.senses:
+        print(sense.get_antonyms())
+        # sense.list_everything()
     # for sense in wn.synsets("good"):
     #     print("Sense: {}\n"
     #           "Part of Speech: {}\n"
