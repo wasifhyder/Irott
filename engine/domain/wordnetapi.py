@@ -1,3 +1,5 @@
+import random
+
 from nltk.corpus import wordnet as wn
 
 class Word:
@@ -26,7 +28,7 @@ class Sense:
         self.frequency = []
 
     def __repr__(self):
-        return "{}".format(self.wordnet_name)
+        return "S: {}".format(self.wordnet_name)
 
     def list_everything(self):
         print("Name: {}\n"
@@ -52,9 +54,12 @@ class Sense:
     def get_synonyms(self):
         """ Tried very hard to embed synset information
             However, the lemmas don't have an associated synset information to save
+
+            One solution would be to calculate synsets based on similarity
         """
         result = []
         # Find the original synset from which this sense came
+        # The Sense class initializes based on the information provided by a synset
         wordnet_sense = next(x for x in wn.synsets(self.word) if x.name() == self.wordnet_name)
         for lemma in wordnet_sense.lemmas():
             result.append(lemma.name())
@@ -81,8 +86,11 @@ if __name__ == "__main__":
     # w = Word("rage")
     from nltk.corpus import wordnet as wn
     w = Word("calm")
-    for sense in w.senses:
-        print(sense.get_antonyms())
+    sense = w.senses[0]
+    # This would have been a disambiguation technique
+    # wouldn't work because the word has no information besides itself
+    for word in sense.synonyms:
+        print(word, [x for x in Word(word).senses])
         # sense.list_everything()
     # for sense in wn.synsets("good"):
     #     print("Sense: {}\n"
