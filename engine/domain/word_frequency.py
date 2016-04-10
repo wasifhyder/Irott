@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 
 def read_file_ordered_by_frequency():
-    with open("kilgarrif_frequency.txt") as f:
+    with open("resources\kilgarrif_frequency.txt") as f:
         for line in f.readlines():
             l = line.strip().split()
             freq = l[1]
@@ -15,7 +15,7 @@ def read_file_ordered_by_frequency():
             yield freq, word, pos
 
 def read_file_ordered_by_alphabet():
-    with open("kilgarrif_alphabetical.txt") as f:
+    with open("resources\kilgarrif_alphabetical.txt") as f:
         for line in f.readlines():
             l = line.strip().split()
             freq = l[1]
@@ -25,9 +25,12 @@ def read_file_ordered_by_alphabet():
             yield freq, word, pos
 
 
-def get_similar_frequency_words(word, pos=""):
+def similar_freq_words(word, pos=""):
     # Find frequency of the word
     word_frequency = get_word_frequency((word, pos))
+    # Todo: Find better word_frequency system
+    if word_frequency == None:
+        raise KeyError
     words_by_frequency_table = build_words_by_frequency_table()
     similar_frequency_words = []
     n = 1
@@ -96,7 +99,7 @@ def get_word_frequency(word):
 
 
 if __name__ == "__main__":
-    print(get_similar_frequency_words("anger", "s"))
+    print(similar_freq_words("anger", "s"))
     # print(build_word_frequency_table())
 
     # print(word_frequency_table)

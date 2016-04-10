@@ -1,4 +1,5 @@
 import pickle
+import json
 import random
 from collections import namedtuple
 
@@ -9,11 +10,11 @@ from collections import namedtuple
 from test_domain_model import load_word_list_with_wordnet_info, word_list
 from WordModel import Word, Sense
 
-domain_model = pickle.load(open("resources/vocab_cefr_list.p", "rb"))
+# domain_model = pickle.load(open("resources/vocab_cefr_list.p", "rb"))
 
 
 # Loads the student model from a pickle file
-student_model = pickle.load(open("resources/empty_student_model-wordnet.p", "rb"))
+# student_model = pickle.load(open("resources/empty_student_model-wordnet.p", "rb"))
 
 class WordProfile:
     # Word profile is made up of all the word senses
@@ -65,9 +66,6 @@ class SenseProfile:
         return "{}".format((self.sense, self.score))
 
     def __eq__(self, other):
-        if isinstance(other, Sense):
-            return self.sense == other
-        else:
             return self.sense == other.sense
 
     def __hash__(self):
@@ -106,8 +104,9 @@ class Student:
         # Find the sense
         sense_profiles = self.get_sense_profile(sense)
         for s in sense_profiles:
-            if s == sense:
+            if s.sense == sense:
                 s.update_score(correct)
+                break
 
 
 if __name__ == "__main__":

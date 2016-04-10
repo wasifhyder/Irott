@@ -3,7 +3,7 @@ import random
 from nltk.corpus import wordnet as wn
 
 from domain.test_domain_model import load_word_list
-from domain.word_frequency import get_similar_frequency_words
+from domain.word_frequency import similar_freq_words
 from domain.WordModel import Word
 
 """
@@ -58,35 +58,46 @@ class Quiz:
             pass
         pass
 
-def generate_definition_question(word, cefr, prompt="What's the meaning of the word {}"):
+def generate_definition_question(word, prompt="What's the meaning of the word {}"):
     """
         Method: Find the definitions of the word. Choose the definition that doesn't include the target
                 word
     """
-    # Return a list of definitions
-    definitions = Word(word, cefr=cefr).senses
-    # Filter out the definitions that contain the target word
-    definition = [definition for definition in definitions if word not in definition.definition]
+    # Filters out the definition the contains the target word
+    # Todo: Expand the filter to exclude morphological forms
+    w = Word(word)
+    candidates = [sense for sense in w if w.word not in sense.definition]
+    sense = random.choice(candidates)
+
     # Generate Question
-    definition = random.choice(definition)
-    partOfSpeech = definition.pos
+    # First randomly select a definition
+    definition = sense.definition
+    pos = sense.pos
     try:
-        distractors = random.sample(get_similar_frequency_words(word, partOfSpeech), 3)
-        distractors = [random.choice(wn.synsets(w)).definition() for w in distractors]
-    except KeyError as e:
-        print("Couldn't find frequency for this word")
+        # Get words in the same part of speech that have similar frequency
+        # First returns a list of similar frequency words
+        # Then chooses 3 candidates
 
+        distractor_candidates = random.sample(similar_freq_words(word, pos), 3)
+        # For each distractor, find the definition
+        # Make sure the part of speech matches
+        distractors = []
+        for candidate in distractor_candidates:
+            distractor = random.choice([sense.definition for sense in Word(candidate) if sense.pos == pos])
+            distractors.append(distractor)
+    except (KeyError, IndexError) as e:
+        print("Couldn't find the frequency for this word")
+        print(e)
 
-    # Choose distractor words
-    # Create the question
-    return Question(word, prompt, correct=definition, incorrect=distractors)
+    return Question(sense, prompt, correct=sense.definition, incorrect=distractors)
 
 
 class Question:
-    def __init__(self, word, prompt, correct, incorrect, feedback=""):
-        self.word = word
+    def __init__(self, sense, prompt, correct, incorrect, feedback=""):
+        self.sense = sense
+        self.word = sense.sense_word
         self.prompt = prompt
-        self.correct = correct.definition
+        self.correct = correct
         self.incorrect = incorrect
         self.feedback = feedback
 
@@ -113,9 +124,9 @@ class Question:
 
 if __name__ == "__main__":
     word_list = load_word_list()
-    for word, cefr in random.sample(word_list, 10):
+    for word in random.sample(word_list, 10):
         try:
-            generate_definition_question(word, cefr).ask()
+            generate_definition_question(word).ask()
         except Exception:
             print("Couldn't generate question for the word {}".format(word))
 
