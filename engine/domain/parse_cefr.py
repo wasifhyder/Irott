@@ -1,7 +1,7 @@
 import pickle
 import nltk.data
 
-from wordnetapi import Word
+from WordModel import Word
 
 def read_file(filename):
     with open(filename) as f:

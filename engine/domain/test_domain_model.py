@@ -1,41 +1,46 @@
 import pickle
-from wordnetapi import Word
+
+import dill
+
+from WordModel import Word
 from collections import namedtuple
 
-def load_word_list():
-    word_list = pickle.load(open("vocab_cefr_list.p", "rb"))
-    return word_list.keys()
 
-def load_word_cefr_list():
-    word_cefr_list = pickle.load(open("vocab_cefr_list.p", "rb"))
+def load_word_list_with_cefr_info():
+    word_cefr_list = pickle.load(open("resources/vocab_cefr_list.p", "rb"))
+    word_cefr_list = [(k, v) for k, v in word_cefr_list.items()]
     return word_cefr_list
 
-# old
-# def word_def_syn(word):
-#     word = domain_model[word]
-#     print(word.word)
-#     for definition in word.definitions:
-#         print("-"*15)
-#         print(definition)
-#         if definition.synonyms:
-#             for synonym in definition.synonyms:
-#                 print(synonym)
+def load_word_list_with_wordnet_info():
+    # List of words created using Word from wordnetapi
+    word_cefr_list = pickle.load(open("resources/vocab_cefr_list.p", "rb"))
+    word_cefr_list = [Word(k, v) for k, v in word_cefr_list.items()]
+    return word_cefr_list
 
-# Don't know what this is for. Most likely, to print word and its definitions
-# def word_def_syn(word):
-#     if word in word_list:
-#         word = Word(word, word_list[word])
-#         print(word, word.definitions)
+def load_word_list():
+    # Redundant
+    word_list = [k for k,v in load_word_list_with_cefr_info()]
+    return word_list
+
+def load_domain_model():
+    vocab_list = []
+    for word, cefr in load_word_list_with_cefr_info().items():
+        vocab_list.append(Word(word))
+    return vocab_list
+
+def load_word_list_by_cefr_key():
+    return pickle.load(open("resources/word_list_by_cefr_key.p", 'rb'))
+
+def find_cefr(word):
+    for cefr, wordset in load_word_list_by_cefr_key().items():
+        if word in wordset:
+            return cefr
+    return "U0"
+
+
+word_list = load_word_list()
+word_list_by_cefr_key = load_word_list_by_cefr_key()
+
 
 if __name__ == "__main__":
-    word_cefr_list = load_word_cefr_list()
-    word_list = load_word_list()
-
-    Word = namedtuple('Word', ['word', 'cefr'])
-    word_list_tuple = [Word(k,v) for k,v in word_cefr_list.items()]
-
-    t = [(k,v) for k, v in word_cefr_list.items()]
-
-    for item in filter(lambda x: x.cefr=="C1", word_list_tuple):
-        print(item.word, item.cefr)
-
+    print(find_cefr("snake"))
