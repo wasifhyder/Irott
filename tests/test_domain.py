@@ -2,7 +2,7 @@ import unittest
 import mock
 import nose
 
-from WordModel import Word, get_senses, Sense
+from datamodel import Word, get_senses, Sense
 from nltk.corpus import wordnet as wn
 
 

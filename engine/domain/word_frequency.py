@@ -99,4 +99,5 @@ def average(list_of_num):
 
 
 if __name__ == "__main__":
-    pass
+    print(_word_frequency_table['finger'])
+    print(get_word_frequency("finger", 'v'))

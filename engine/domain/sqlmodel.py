@@ -10,15 +10,11 @@ we have. This model will be referenced by both the student model and the instruc
 model.
 '''
 
-import WordModel
+import datamodel
 from word_lists import word_list
 
 Base = declarative_base()
 
-# WordDefinition = Table('word_definitions',
-#                        Base.metadata,
-#                        Column('word_id', String, ForeignKey('words.id'), primary_key=True),
-#                        Column('definition_id', String, ForeignKey('definitions.id'), primary_key=True))
 
 class Word(Base):
     """
@@ -53,14 +49,13 @@ class Sense(Base):
 
     senseid = Column(Integer(), primary_key=True)
     wordid = Column(Integer, ForeignKey('word.wordid'))
+    pos = Column(String(3))
+    sense = Column(String(50))
     definition = Column(String(50))
 
-    #
     # examples = relationship("Example", backref="definition")
     # synonyms = relationship("Synonym", backref="definition")
 
-    # cefr = relationship("CEFR", backref=backref("definition", uselist=False))
-    # pos = relationship("POS", backref=backref("definition", uselist=False))
 
     def __repr__(self):
         return "<Definition {}>".format(self.definition)
@@ -104,7 +99,7 @@ s = Session()
 
 
 for word in word_list[:25]:
-    wm = WordModel.Word(word)
+    wm = datamodel.Word(word)
     w = Word(word=word, cefr=wm.cefr)
     for sense in wm:
         definition = Sense(definition= sense.definition, word=w)

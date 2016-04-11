@@ -1,5 +1,5 @@
 import pickle
-from WordModel import Word
+from datamodel import Word
 
 
 def load_word_list_with_cefr_info():

@@ -5,7 +5,7 @@ from collections import namedtuple
 
 from instructor.accuracy_model import AccuracyModel
 from domain.word_lists import load_word_list_with_wordnet_info, word_list
-from domain.WordModel import Word
+from domain.datamodel import Word
 
 
 class WordProfile:

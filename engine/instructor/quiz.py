@@ -4,7 +4,7 @@ from nltk.corpus import wordnet as wn
 
 from domain.word_lists import load_word_list
 from domain.word_frequency import similar_freq_words
-from domain.WordModel import Word
+from domain.datamodel import Word
 
 """
 The best way to design would be to talk things out. Right now, I'm trying to
