@@ -2,15 +2,15 @@ import random
 
 from nltk.corpus import wordnet as wn
 
+def get_senses(word):
+    return [sense for sense in wn.synsets(word)]
+
+
 class Word:
-    id = 0
     # The domain model should be indexable using the word
     # The domain model should be indexable using the word_id
     def __init__(self, word):
-
-        from test_domain_model import find_cefr
-        self.id = Word.id
-        Word.id += 1
+        from word_lists import find_cefr
         self.word = word
         self.cefr = find_cefr(word)
         self.senses = [Sense(sense, parent=self) for sense in wn.synsets(self.word)]
@@ -69,16 +69,22 @@ class Sense:
         return "<Sense {}>".format(self.wordnet_name)
 
     def __lt__(self, other):
-        if self.parent_word_id == other.parent_word_id:
-            self.id < other.id
+        if self.parent_word == other.parent_word:
+            if self.pos == other.pos:
+                return self.id < other.id
+            else:
+                return self.pos < other.pos
         else:
-            self.parent_word_id < other.parent_word_id
+            return self.parent_word < other.parent_word
 
     def __hash__(self):
         return hash(self.wordnet_name)
 
     def __eq__(self, other):
-        return self.wordnet_name == other.wordnet_name
+        if isinstance(other, Sense):
+            return self.wordnet_name == other.wordnet_name
+        else:
+            return False
 
     def list_everything(self):
         print("Name: {}\n"

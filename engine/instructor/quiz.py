@@ -2,7 +2,7 @@ import random
 
 from nltk.corpus import wordnet as wn
 
-from domain.test_domain_model import load_word_list
+from domain.word_lists import load_word_list
 from domain.word_frequency import similar_freq_words
 from domain.WordModel import Word
 

@@ -1,9 +1,5 @@
 import pickle
-
-import dill
-
 from WordModel import Word
-from collections import namedtuple
 
 
 def load_word_list_with_cefr_info():

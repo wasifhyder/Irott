@@ -3,18 +3,10 @@ import json
 import random
 from collections import namedtuple
 
-# old
-# domain_model = pickle.load(open("vocab_model.p", "rb"))
+from instructor.accuracy_model import AccuracyModel
+from domain.word_lists import load_word_list_with_wordnet_info, word_list
+from domain.WordModel import Word
 
-# new
-from test_domain_model import load_word_list_with_wordnet_info, word_list
-from WordModel import Word, Sense
-
-# domain_model = pickle.load(open("resources/vocab_cefr_list.p", "rb"))
-
-
-# Loads the student model from a pickle file
-# student_model = pickle.load(open("resources/empty_student_model-wordnet.p", "rb"))
 
 class WordProfile:
     # Word profile is made up of all the word senses
@@ -30,6 +22,7 @@ class WordProfile:
 
         self.n = len(self.senses_profiles)
 
+    # Makes the WordProfile iterable
     def __iter__(self):
         return self.senses_profiles.__iter__()
     def __next__(self):
@@ -61,6 +54,7 @@ class SenseProfile:
         self.parent = parent
         self.sense = sense
         self.score = 0.0
+        self.proficiency = AccuracyModel()
 
     def __repr__(self):
         return "{}".format((self.sense, self.score))
@@ -73,10 +67,12 @@ class SenseProfile:
     # Update Score for the sense
 
     def update_score(self, correct):
-        if correct:
-            self.score += 0.2
-        else:
-            self.score -= 0.2
+        # Initial Version
+        # if correct:
+        #     self.score += 0.2
+        # else:
+        #     self.score -= 0.2
+        self.score = self.proficiency.update(correct) # Has sideeffect
         self.parent.update_score()
 
 class Student:
@@ -92,7 +88,6 @@ class Student:
         # Each word has multiple senses, each with their own profile
         for word in load_word_list_with_wordnet_info():
             word_profile = WordProfile(word)
-            self.vocabulary_profile
 
     def get_word_profile(self, word):
         return self.vocabulary_profile[word]
@@ -113,9 +108,23 @@ if __name__ == "__main__":
     wasif = Student("wasif", "pass")
     sense = Word("pool").senses[0]
     wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
     sense = Word("fight").senses[0]
     wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=False)
+    wasif.update_score(sense, correct=False)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
+    wasif.update_score(sense, correct=True)
     sense = Word("age").senses[0]
+    wasif.update_score(sense, correct=False)
+    wasif.update_score(sense, correct=False)
+    wasif.update_score(sense, correct=False)
+    wasif.update_score(sense, correct=False)
     wasif.update_score(sense, correct=False)
 
     print(wasif.get_word_profile('pool'))

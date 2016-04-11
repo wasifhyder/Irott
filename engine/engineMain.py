@@ -2,7 +2,7 @@ import random
 
 from quiz import Question
 from student.test_student_model import Student
-from domain.test_domain_model import word_list
+from domain.word_lists import word_list
 from instructor.quiz import generate_definition_question
 
 if __name__ == "__main__":
