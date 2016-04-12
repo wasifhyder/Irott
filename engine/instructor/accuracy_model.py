@@ -5,8 +5,8 @@ import numpy
 
 import accuracy_params as params
 
-EWMA_SEED = -5
-PROBABILITY_FIRST_PROBLEM_CORRECT = 0
+EWMA_SEED = -0.8
+PROBABILITY_FIRST_PROBLEM_CORRECT = 0.25
 MAX_HISTORY_KEPT = 20
 
 class AccuracyModel:
@@ -204,11 +204,10 @@ class InvFnExponentialNormalizer:
 
 if __name__ == "__main__":
     a = AccuracyModel()
-    a.update(True)
-    a.update(True)
-    a.update(True)
     a.update(False)
-    a.update(True)
+    a.update(False)
+    a.update(False)
+    a.update(False)
     print(a.score())
 
     for i in range(21):

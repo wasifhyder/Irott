@@ -1,8 +1,11 @@
+import random
+
 import word_frequency
 from word_lists import word_list, find_cefr
 from collections import namedtuple
 import datamodel
 import ast
+from nltk.corpus import wordnet
 
 class Word:
     def __init__(self, word, cefr, senses):
@@ -11,30 +14,47 @@ class Word:
         self.cefr = cefr
         self.senses = {s.name:s for s in senses}
 
+    def random_sense(self):
+        r = random.randint(0, len(self.senses))
+        for i, key in enumerate(self.senses):
+            if i == r:
+                return self.senses[key]
+
     # Iteration
     def __iter__(self):
         return self.senses.values().__iter__()
     def __next__(self):
         return self.__next__()
 
+    def __len__(self):
+        return self.senses.__len__()
+
     # Orderable
     def __lt__(self, other):
-        if isinstance(self, type(other)) and self.word == other.word:
-            return self.cefr < other.cefr
-        else:
-            return self.word < other.word
+        if isinstance(other, type(self)):
+            if self.word == other.word:
+                return self.cefr < other.cefr
+            else:
+                return self.word < other.word
+        raise TypeError
 
     # Hashing
     def __eq__(self, other):
-        if isinstance(self, type(other)): return self.word == other.word
-        return False
+        if isinstance(other, type(self)):
+            return self.word == other.word
+        raise TypeError
     def __hash__(self):
         return hash(self.word)
     # Use senses' name to check
     def __getitem__(self, item):
+        # Added int to be able to select a random sense
+        if isinstance(item, int):
+            l = list(self.senses.values())
+            return l.__getitem__(item)
         return self.senses.__getitem__(item)
     def __contains__(self, item):
         return item in self.senses
+
 
     # Representation
     def __repr__(self):
@@ -42,6 +62,8 @@ class Word:
         for sense in self:
             result += "\t{}\n".format(sense)
         return result
+
+
 class Sense:
     def __init__(self, name, pos, definition, examples, synonyms, antonyms, frequency):
         self.name = name
@@ -59,12 +81,15 @@ class Sense:
                                     self.frequency))
 
     def __lt__(self, other):
-        if isinstance(self, type(other)): return self.name < other.name
+        if isinstance(other, type(self)):
+            return self.name < other.name
+        raise TypeError
     def __hash__(self):
         return hash(self.name)
     def __eq__(self, other):
-        if isinstance(self, type(other)): return self.name == other.name
-        return False
+        if isinstance(other, type(self)):
+            return self.name == other.name
+        raise TypeError
 
 
 class DomainModel:
@@ -101,11 +126,45 @@ class DomainModel:
             return filter(lambda word: word.cefr == cefr, self)
         return []
 
+    def items(self):
+        return self.word_list.items()
+
+    def random(self):
+        return random.choice(self.word_list.keys())
+
+    def sample(self, n):
+        return random.sample(self.word_list.keys(), n)
+
+    def save(self):
+        result = ""
+        for word in self:
+            result += "{}||{}||{}\n".format(word, find_cefr(word), len(self[word]))
+            for s in self[word]:
+                result += "{}||{}||{}||{}||{}||{}\n".format(s.name, s.pos,
+                                                          s.definition, s.examples,
+                                                          s.synonyms, s.antonyms)
+        with open('resources/data.in', 'w') as f:
+            f.write(result)
+
     def __iter__(self):
-        return self.word_list.values().__iter__()
+        return self.word_list.__iter__()
     def __next__(self):
         return self.__next__()
+    def __len__(self):
+        return self.word_list.values().__len__()
     def __getitem__(self, item):
+        if not self.word_list.__contains__(item):
+            wd = datamodel.Word(item)
+            word = wd.word
+            cefr = wd.cefr
+            senses = []
+            for s in wd:
+                frequency = word_frequency.get_word_frequency(word, s.pos)
+                sense = Sense(s.wordnet_name, s.pos, s.definition, s.examples,
+                      s.synonyms, s.antonyms, frequency)
+                senses.append(sense)
+            self.word_list[item] = Word(word, cefr, senses)
+            # self.save()
         return self.word_list.__getitem__(item)
     def __contains__(self, item):
         return item in self.word_list
@@ -128,6 +187,7 @@ def print_info():
 if __name__ == "__main__":
     # print_info()
     d = DomainModel()
+    d.save()
     # for i, word in enumerate(d):
     #     if i > 10:
     #         break

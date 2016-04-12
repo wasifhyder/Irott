@@ -2,6 +2,7 @@ import random
 
 from nltk.corpus import wordnet as wn
 
+
 def get_senses(word):
     return [sense for sense in wn.synsets(word)]
 
