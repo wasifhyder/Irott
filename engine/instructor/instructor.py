@@ -15,7 +15,7 @@ create a quizzing engine. The quizzing engine supports the asking
 class QuizEngine:
     pass
 
-class Quiz:
+class Instructor:
     """
         Quiz can have three types of quizzes at the very least:
             > Assessment: Figures out which words are trouble / known
@@ -58,6 +58,24 @@ class Quiz:
             self.student_model[word][sense].update(correct)
         self.student_model.save()
 
+    def get_quiz(self):
+        words = self.student_model.words()
+        word = random.choice(words)
+        q = self.generate_definition_question(word)
+        sense = q.sense.name
+
+        result = {
+            'word': word,
+            'sense': sense,
+            'prompt': q.prompt,
+            'correct': q.correct,
+            'incorrect': q.incorrect,
+            'feedback': q.feedback
+        }
+        print(result['incorrect'])
+        return result
+
+    # def update_quiz(self, correct):
 
     def generate_question(self):
         # Use the automatic question generation technique
@@ -82,7 +100,6 @@ class Quiz:
         senses = self.domain_model[word]
         candidates = [sense for sense in senses if word not in sense.definition]
         sense = random.choice(candidates)
-
         # Generate Question
         # First randomly select a definition
         definition = sense.definition
@@ -104,7 +121,7 @@ class Quiz:
             print("Couldn't find the frequency for this word")
             print(e)
 
-        return Question(sense, prompt, correct=sense.definition, incorrect=distractors)
+        return Question(sense, prompt, correct=definition, incorrect=distractors)
 
 
 class Question:
@@ -142,7 +159,7 @@ if __name__ == "__main__":
     s = StudentModel('wasif', '123')
     d = DomainModel()
     print(s.wordsSeen())
-    q = Quiz(d, s, 20)
+    q = Instructor(d, s, 20)
     q.quiz()
 
     print(s.wordsSeen())

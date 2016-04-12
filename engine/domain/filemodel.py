@@ -55,12 +55,18 @@ class Word:
     def __contains__(self, item):
         return item in self.senses
 
+    def json(self):
+        return self.__repr__()
 
     # Representation
     def __repr__(self):
-        result = "<Word {}>\n".format((self.word, self.cefr, self.frequency))
-        for sense in self:
-            result += "\t{}\n".format(sense)
+        result = {
+            'word': self.word,
+            'cefr': self.cefr,
+            'senses': {
+            k: v.json() for (k, v) in self.senses.items()
+            }
+        }
         return result
 
 
@@ -73,6 +79,18 @@ class Sense:
         self.synonyms = synonyms
         self.antonyms = antonyms
         self.frequency = frequency
+
+    def json(self):
+        result = {
+            'name': self.name,
+            'pos': self.pos,
+            'definition': self.definition,
+            'examples': self.examples,
+            'synonyms': self.synonyms,
+            'antonyms': self.antonyms,
+            'frequency': self.frequency
+        }
+        return result
 
     def __repr__(self):
         return "<Sense {}>".format((self.name, self.pos,

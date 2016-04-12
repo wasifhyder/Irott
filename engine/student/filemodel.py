@@ -101,20 +101,19 @@ class VocabularyProfile:
                 self.profile[word][sense].score = sense_score
             self.profile[word].update()
 
-    def words(self, n=0, f=None):
+    def words(self, n=1, f=None):
         result = []
         i = 0
         for word in filter(f, self):
-            if n != 0:
-                if i > n: break
+            if i > n: break
             result.append(word)
             i += 1
         return result
 
-    def wordsSeen(self, n=0):
+    def wordsSeen(self, n=1):
         return self.words(n, lambda x: self[x].score != 0)
 
-    def wordsNotSeen(self, n=0):
+    def wordsNotSeen(self, n=1):
         return self.words(n, lambda x: self[x].score == 0)
 
     def __repr__(self):
