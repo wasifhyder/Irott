@@ -1,8 +1,3 @@
-import pickle
-import json
-import random
-from collections import namedtuple
-
 from instructor.accuracy_model import AccuracyModel
 from domain.word_lists import load_word_list_with_wordnet_info, word_list
 from domain.datamodel import Word

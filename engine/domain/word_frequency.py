@@ -84,14 +84,16 @@ def get_word_frequency(word, pos=""):
     """
     if word in _word_frequency_table:
         word_frequencies = _word_frequency_table.get(word)
+        if pos == "":
+            nums = [int for int in word_frequencies.values()]
+            return average(nums)
         if pos in ['a', 'n', 'v'] and pos in word_frequencies:
             return word_frequencies[pos]
         else:
-            nums = [int for int in word_frequencies.values()]
-            return average(nums)
+            return 0
     else:
         # Todo: find frequency from http://www.wordandphrase.info/frequencyList.asp
-        return random.randint(800, 10000)
+        return 0
 
 
 def average(list_of_num):
