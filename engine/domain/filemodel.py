@@ -1,9 +1,10 @@
 import random
 
-import word_frequency
-from word_lists import word_list, find_cefr
+
+from ..domain import word_frequency
+from ..domain.word_lists import word_list, find_cefr
 from collections import namedtuple
-import datamodel
+from ..domain import datamodel
 import ast
 from nltk.corpus import wordnet
 

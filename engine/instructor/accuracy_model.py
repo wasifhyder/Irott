@@ -3,7 +3,7 @@ from collections import deque
 
 import numpy
 
-import accuracy_params as params
+from ..instructor import accuracy_params as params
 
 EWMA_SEED = -0.8
 PROBABILITY_FIRST_PROBLEM_CORRECT = 0.25
