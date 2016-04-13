@@ -7,9 +7,9 @@ from flask import Flask, jsonify
 from flask import render_template
 from flask.ext.bootstrap import Bootstrap
 
-from ..engine.domain.filemodel import DomainModel
-from ..engine.student.filemodel import StudentModel
-from ..engine.instructor.instructor import Instructor
+from engine.domain.filemodel import DomainModel
+from engine.student.filemodel import StudentModel
+from engine.instructor.instructor import Instructor
 
 app = Flask(__name__)
 Bootstrap(app)
