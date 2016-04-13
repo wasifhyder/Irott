@@ -1,3 +1,8 @@
+from flask import Flask, render_template
+
+app = Flask(__name__)
+
+
 from flask import Flask, jsonify
 from flask import render_template
 from flask.ext.bootstrap import Bootstrap
@@ -11,6 +16,12 @@ Bootstrap(app)
 
 S = StudentModel('wasif', '123')
 D = DomainModel()
+
+
+@app.route('/hello')
+def hello():
+    return render_template('hello.html')
+
 
 @app.route('/word/<word>')
 def word(word):
