@@ -28,7 +28,7 @@ def word(word):
     return jsonify(D[word].json())
 
 
-@app.route('/quiz/', methods=['GET'])
+@app.route('/quiz', methods=['GET'])
 def quiz():
     I = Instructor(D, S, 20)
     return jsonify(I.get_quiz())
