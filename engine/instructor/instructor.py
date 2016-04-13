@@ -1,11 +1,11 @@
 import random
 from nltk.corpus import wordnet as wn
 # from domain.word_lists import load_word_list
-from domain.word_frequency import similar_freq_words
+from ..domain.word_frequency import similar_freq_words
 # from domain.datamodel import Word
 
-from student.filemodel import StudentModel
-from domain.filemodel import DomainModel
+from ..student.filemodel import StudentModel
+from ..domain.filemodel import DomainModel
 
 """
 The best way to design would be to talk things out. Right now, I'm trying to
