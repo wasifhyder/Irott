@@ -2,7 +2,6 @@ import random
 
 from nltk.corpus import wordnet as wn
 
-
 def get_senses(word):
     return [sense for sense in wn.synsets(word)]
 
@@ -11,7 +10,7 @@ class Word:
     # The domain model should be indexable using the word
     # The domain model should be indexable using the word_id
     def __init__(self, word):
-        from word_lists import find_cefr
+        from .word_lists import find_cefr
         self.word = word
         self.cefr = find_cefr(word)
         self.senses = [Sense(sense, parent=self) for sense in wn.synsets(self.word)]

@@ -1,4 +1,5 @@
 import pickle
+import os
 
 # An ordered dictionary that keeps words in a list indexable by frequency
 import random
@@ -6,7 +7,7 @@ from collections import OrderedDict
 
 
 def read_file_ordered_by_frequency():
-    with open("resources\kilgarrif_frequency.txt") as f:
+    with open("resources\kilgarrif_frequency.txt".replace("\\", os.sep)) as f:
         for line in f.readlines():
             l = line.strip().split()
             freq = l[1]
@@ -15,7 +16,7 @@ def read_file_ordered_by_frequency():
 
             yield freq, word, pos
 def read_file_ordered_by_alphabet():
-    with open("resources\kilgarrif_alphabetical.txt") as f:
+    with open("resources\kilgarrif_alphabetical.txt".replace("\\", os.sep)) as f:
         for line in f.readlines():
             l = line.strip().split()
             freq = l[1]
@@ -46,7 +47,7 @@ def similar_freq_words(word, pos=""):
     return result
     # Find words that have similar frequency
 def build_words_by_frequency_table():
-    filename = "resources/words_by_frequency_table.p"
+    filename = "resources/words_by_frequency_table.p".replace("\\", os.sep)
     try:
         words_by_frequency_table = pickle.load(open(filename, "rb"))
     except FileNotFoundError as e:
@@ -61,7 +62,7 @@ def build_words_by_frequency_table():
                 words_by_frequency_table[frequency] = [(word, pos)]
     return words_by_frequency_table
 def build_word_frequency_table():
-    filename = "resources/word_frequency_table.p"
+    filename = "resources/word_frequency_table.p".replace("\\", os.sep)
     try:
         word_frequency_table = pickle.load(open(filename, "rb"))
     except FileNotFoundError as e:
