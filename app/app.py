@@ -38,4 +38,8 @@ def index():
     return render_template("index.html")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=81)
+    import platform
+    if platform.dist('Ubuntu'):
+        app.run()
+    else:
+        app.run(debug=True, port=81)
