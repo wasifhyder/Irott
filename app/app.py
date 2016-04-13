@@ -40,6 +40,6 @@ def index():
 if __name__ == '__main__':
     import platform
     if platform.dist('Ubuntu'):
-        app.run()
+        app.run(port=80)
     else:
         app.run(debug=True, port=81)
