@@ -28,7 +28,7 @@ def word(word):
     return jsonify(D[word].json())
 
 
-@app.route('/quiz', methods=['GET'])
+@app.route('/quiz/', methods=['GET'])
 def quiz():
     I = Instructor(D, S, 20)
     return jsonify(I.get_quiz())
@@ -39,7 +39,7 @@ def index():
 
 if __name__ == '__main__':
     import platform
-    if platform.dist('Ubuntu'):
-        app.run(host='0.0.0.0', port=80, threaded=True)
+    if platform.dist()[0] == ('Ubuntu'):
+        app.run(debug=True, host='0.0.0.0', port=80, threaded=True)
     else:
         app.run(debug=True, port=81)
