@@ -11,13 +11,23 @@
   <body>
     <div class="container">
       <h1>Flask React</h1>
-      <br>
-      <div id="main"></div>
+      <h2>We're going to quiz you now</h2>
+      <div id="app"></div>
     </div>
     <!-- scripts -->
-    <script src="{{ url_for('static', filename='bower_components/react/react.min.js') }}"></script>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.min.js') }}"></script>
+        <script>;
+        q = {'prompt':"hello bar"}
+        $.getJSON("http://localhost:81/quiz", "", function(data){
+            q = data;
+            $('div').appendTo(q)
+        });
+    </script>
     <script src="{{ url_for('static', filename='bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
   </body>
 </html>

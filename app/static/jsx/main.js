@@ -1,55 +1,101 @@
-/** @jsx React.DOM */
 
-var DynamicSearch = React.createClass({
 
-  // sets initial state
-  getInitialState: function(){
-    return { searchString: '' };
+var App = React.createClass({
+  getInitialState: function() {
+    return {
+      questionData: [{prompt: q.prompt, answers: ["a","b","c","d"], correct: 2}, {prompt: "Question 2", answers: ["a","b","c","d"], correct: 0}],
+      progress: 0,
+      score: 0
+    };
   },
-
-  // sets state, triggers render method
-  handleChange: function(event){
-    // grab value form input box
-    this.setState({searchString:event.target.value});
-    console.log("scope updated!")
-  },
-
-  render: function() {
-
-    var countries = this.props.items;
-    var searchString = this.state.searchString.trim().toLowerCase();
-
-    // filter countries list by value from input box
-    if(searchString.length > 0){
-      countries = countries.filter(function(country){
-        return country.name.toLowerCase().match( searchString );
-      });
+  checkAnswer: function(index) {
+    var correct = this.state.questionData[this.state.progress].correct;
+    var newScore = 0, newProgress = 0;
+    if (correct === index) {
+      newScore = this.state.score + 1;
+      this.setState({score: newScore});
+      newProgress = this.state.progress + 1;
+      this.setState({progress: newProgress});
+    } else {
+      newProgress = this.state.progress + 1;
+      this.setState({progress: newProgress});
     }
-
+  },
+  resetQuiz: function() {
+    this.setState({score: 0, progress: 0});
+  },
+  render: function() {
+    var questionDatum = this.state.questionData[this.state.progress];
+    if(this.state.questionData.length > this.state.progress) {
     return (
-      <div>
-        <input type="text" value={this.state.searchString} onChange={this.handleChange} placeholder="Search!" />
-        <ul>
-          { countries.map(function(country){ return <li>{country.name} </li> }) }
-        </ul>
-      </div>
-    )
+     <div>
+       <Questions questionDatum={questionDatum} />
+       <AnswerList answers={questionDatum.answers} answerCallback={this.checkAnswer} />
+       <Score score={this.state.score} />
+       <Progress progress={this.state.progress} />
+     </div>
+    );
+    } else {
+      return (
+        <div>
+          <p>Quiz Finished!</p>
+          <span>Your <Score score={this.state.score} /></span>
+          <button type="button" onClick={this.resetQuiz}>Reset Quiz</button>
+        </div>
+      );
+    }
   }
-
 });
 
-// list of countries, defined with JavaScript object literals
-var countries = [
-  {"name": "Sweden"}, {"name": "China"}, {"name": "Peru"}, {"name": "Czech Republic"},
-  {"name": "Bolivia"}, {"name": "Latvia"}, {"name": "Samoa"}, {"name": "Armenia"},
-  {"name": "Greenland"}, {"name": "Cuba"}, {"name": "Western Sahara"}, {"name": "Ethiopia"},
-  {"name": "Malaysia"}, {"name": "Argentina"}, {"name": "Uganda"}, {"name": "Chile"},
-  {"name": "Aruba"}, {"name": "Japan"}, {"name": "Trinidad and Tobago"}, {"name": "Italy"},
-  {"name": "Cambodia"}, {"name": "Iceland"}, {"name": "Dominican Republic"}, {"name": "Turkey"},
-  {"name": "Spain"}, {"name": "Poland"}, {"name": "Haiti"}
-];
+var Score = React.createClass({
+  render: function() {
+    return (
+      <span>Score: {this.props.score}</span>
+    )
+  }
+});
 
-React.render(
-  <DynamicSearch items={ countries } />,
-  document.getElementById('main')
+var Progress = React.createClass({
+  render: function() {
+    return (
+      <p>Question {this.props.progress + 1}</p>
+    )
+  }
+});
+
+var Questions = React.createClass({
+  render: function() {
+    return (
+      <p>{this.props.questionDatum.prompt}</p>
+    )
+  }
+});
+
+var AnswerList = React.createClass({
+  render: function() {
+    return (
+      <ul>
+        {this.props.answers.map(function(answer, index) {
+         return (
+          <ListItem answerItem={answer} answerCallback={this.props.answerCallback} index={index} />
+         )
+        },this)}
+      </ul>
+    );
+  }
+});
+
+var ListItem = React.createClass({
+  onClickAnswer: function() {
+    this.props.answerCallback(this.props.index);
+  },
+  render: function() {
+    return (
+      <li onClick={this.onClickAnswer}>{this.props.answerItem}</li>
+    );
+  }
+});
+ReactDOM.render(
+  <App />,
+  document.getElementById("app")
 );

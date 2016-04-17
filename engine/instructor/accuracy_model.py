@@ -1,9 +1,10 @@
+import json
 import operator
 from collections import deque
 
 import numpy
 
-from ..instructor import accuracy_params as params
+from engine.instructor import accuracy_params as params
 
 EWMA_SEED = -0.8
 PROBABILITY_FIRST_PROBLEM_CORRECT = 0.25
@@ -14,9 +15,12 @@ class AccuracyModel:
     Predicts the probabilty of the next problem being correct
     using logistic regression.
     """
-    def __init__(self):
+    def __init__(self, answer_history=None):
         # History of the past answers up to MAX_HISTORY_KEPT
-        self.answer_history = deque([0 for x in range(20)])
+        if answer_history:
+            self.answer_history = deque(answer_history)
+        else:
+            self.answer_history = deque([0 for x in range(20)])
 
         # This is capped at MAX_HISTORY_KEPT
         self.total_done = len(self.answer_history )
@@ -34,6 +38,9 @@ class AccuracyModel:
     # Todo: make this sliding, so that 0 is the most recent problem done
     def get_answer_at(self, index):
         return self.answer_history[index]
+
+    def __repr__(self):
+        return json.dumps(list(self.answer_history))
 
     # Exponential moving average
     # See http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average

@@ -1,58 +1,104 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/** @jsx React.DOM */
 
-var DynamicSearch = React.createClass({displayName: "DynamicSearch",
 
-  // sets initial state
-  getInitialState: function(){
-    return { searchString: '' };
+var App = React.createClass({displayName: "App",
+  getInitialState: function() {
+    return {
+      questionData: [{prompt: q.prompt, answers: ["a","b","c","d"], correct: 2}, {prompt: "Question 2", answers: ["a","b","c","d"], correct: 0}],
+      progress: 0,
+      score: 0
+    };
   },
-
-  // sets state, triggers render method
-  handleChange: function(event){
-    // grab value form input box
-    this.setState({searchString:event.target.value});
-    console.log("scope updated!")
-  },
-
-  render: function() {
-
-    var countries = this.props.items;
-    var searchString = this.state.searchString.trim().toLowerCase();
-
-    // filter countries list by value from input box
-    if(searchString.length > 0){
-      countries = countries.filter(function(country){
-        return country.name.toLowerCase().match( searchString );
-      });
+  checkAnswer: function(index) {
+    var correct = this.state.questionData[this.state.progress].correct;
+    var newScore = 0, newProgress = 0;
+    if (correct === index) {
+      newScore = this.state.score + 1;
+      this.setState({score: newScore});
+      newProgress = this.state.progress + 1;
+      this.setState({progress: newProgress});
+    } else {
+      newProgress = this.state.progress + 1;
+      this.setState({progress: newProgress});
     }
-
+  },
+  resetQuiz: function() {
+    this.setState({score: 0, progress: 0});
+  },
+  render: function() {
+    var questionDatum = this.state.questionData[this.state.progress];
+    if(this.state.questionData.length > this.state.progress) {
     return (
-      React.createElement("div", null, 
-        React.createElement("input", {type: "text", value: this.state.searchString, onChange: this.handleChange, placeholder: "Search!"}), 
-        React.createElement("ul", null, 
-           countries.map(function(country){ return React.createElement("li", null, country.name, " ") }) 
+     React.createElement("div", null, 
+       React.createElement(Questions, {questionDatum: questionDatum}), 
+       React.createElement(AnswerList, {answers: questionDatum.answers, answerCallback: this.checkAnswer}), 
+       React.createElement(Score, {score: this.state.score}), 
+       React.createElement(Progress, {progress: this.state.progress})
+     )
+    );
+    } else {
+      return (
+        React.createElement("div", null, 
+          React.createElement("p", null, "Quiz Finished!"), 
+          React.createElement("span", null, "Your ", React.createElement(Score, {score: this.state.score})), 
+          React.createElement("button", {type: "button", onClick: this.resetQuiz}, "Reset Quiz")
         )
-      )
-    )
+      );
+    }
   }
-
 });
 
-// list of countries, defined with JavaScript object literals
-var countries = [
-  {"name": "Sweden"}, {"name": "China"}, {"name": "Peru"}, {"name": "Czech Republic"},
-  {"name": "Bolivia"}, {"name": "Latvia"}, {"name": "Samoa"}, {"name": "Armenia"},
-  {"name": "Greenland"}, {"name": "Cuba"}, {"name": "Western Sahara"}, {"name": "Ethiopia"},
-  {"name": "Malaysia"}, {"name": "Argentina"}, {"name": "Uganda"}, {"name": "Chile"},
-  {"name": "Aruba"}, {"name": "Japan"}, {"name": "Trinidad and Tobago"}, {"name": "Italy"},
-  {"name": "Cambodia"}, {"name": "Iceland"}, {"name": "Dominican Republic"}, {"name": "Turkey"},
-  {"name": "Spain"}, {"name": "Poland"}, {"name": "Haiti"}
-];
+var Score = React.createClass({displayName: "Score",
+  render: function() {
+    return (
+      React.createElement("span", null, "Score: ", this.props.score)
+    )
+  }
+});
 
-React.render(
-  React.createElement(DynamicSearch, {items:  countries }),
-  document.getElementById('main')
+var Progress = React.createClass({displayName: "Progress",
+  render: function() {
+    return (
+      React.createElement("p", null, "Question ", this.props.progress + 1)
+    )
+  }
+});
+
+var Questions = React.createClass({displayName: "Questions",
+  render: function() {
+    return (
+      React.createElement("p", null, this.props.questionDatum.prompt)
+    )
+  }
+});
+
+var AnswerList = React.createClass({displayName: "AnswerList",
+  render: function() {
+    return (
+      React.createElement("ul", null, 
+        this.props.answers.map(function(answer, index) {
+         return (
+          React.createElement(ListItem, {answerItem: answer, answerCallback: this.props.answerCallback, index: index})
+         )
+        },this)
+      )
+    );
+  }
+});
+
+var ListItem = React.createClass({displayName: "ListItem",
+  onClickAnswer: function() {
+    this.props.answerCallback(this.props.index);
+  },
+  render: function() {
+    return (
+      React.createElement("li", {onClick: this.onClickAnswer}, this.props.answerItem)
+    );
+  }
+});
+ReactDOM.render(
+  React.createElement(App, null),
+  document.getElementById("app")
 );
 
 },{}]},{},[1])

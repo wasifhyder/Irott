@@ -1,8 +1,8 @@
 import random
 from collections import namedtuple
 
-from ..instructor.accuracy_model import AccuracyModel
-from ..domain import filemodel
+from engine.instructor.accuracy_model import AccuracyModel
+from engine.domain import filemodel
 
 class WordProfile:
     def __init__(self, word):

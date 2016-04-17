@@ -25,7 +25,7 @@ def hello():
 
 @app.route('/word/<word>')
 def word(word):
-    return jsonify(D[word].json())
+    return jsonify(D[word].dict_repr())
 
 
 @app.route('/quiz/', methods=['GET'])

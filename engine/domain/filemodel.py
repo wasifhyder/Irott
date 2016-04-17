@@ -65,8 +65,8 @@ class Word:
             'word': self.word,
             'cefr': self.cefr,
             'senses': {
-            k: v.json() for (k, v) in self.senses.items()
-            }
+                k: v.dict_repr() for (k, v) in self.senses.items()
+                }
         }
         return result
 

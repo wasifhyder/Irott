@@ -96,6 +96,11 @@ def get_word_frequency(word, pos=""):
         # Todo: find frequency from http://www.wordandphrase.info/frequencyList.asp
         return 0
 
+def get_word_frequency_all(word):
+    if word in _word_frequency_table:
+        return _word_frequency_table[word]
+    else:
+        return 0
 
 def average(list_of_num):
     return int(sum(list_of_num) / len(list_of_num))

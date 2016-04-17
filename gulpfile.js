@@ -8,8 +8,6 @@ var gulp = require('gulp'),
     clean = require('gulp-clean');
 
 
-// tasks
-
 gulp.task('transform', function () {
   return gulp.src('./app/static/jsx/main.js')
     .pipe(browserify({transform: ['reactify']}))
@@ -24,5 +22,4 @@ gulp.task('clean', function () {
 
 gulp.task('default', ['clean'], function () {
   gulp.start('transform');
-  gulp.watch('./app/jsx/main.js', ['transform']);
 });
