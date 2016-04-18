@@ -1,8 +1,10 @@
+import time
 import json
 import random
 from collections import namedtuple
 import os.path
 
+from engine.domain.filemodel import DomainModel
 from engine.instructor.accuracy_model import AccuracyModel
 from engine.domain import filemodel
 
@@ -16,18 +18,26 @@ class WordProfile:
         self.n = len(self.sense_profiles)
 
     @staticmethod
-    def load_json(word_profile):
+    def load_json(word_profile, new=False):
         word = word_profile['word']
         score = word_profile['score']
         sense_profiles_json = word_profile['sense_profile']
-        active = word_profile['active']
-        date_activated = word_profile['date_activated']
+        if new:
+            active = False
+            date_activated = None
+        else:
+            active = word_profile['active']
+            date_activated = word_profile['date_activated']
         return WordProfile(word, score, sense_profiles_json, active, date_activated)
 
     def update(self):
         if self.n == 0: return 0
+        if self.active == False:
+            self.active = True
+            self.date_activated = time.strftime("%c")
         self.score = sum([v.score for x,v in self.sense_profiles.items()])/self.n
-    def updateSense(self, sense, correct):
+
+    def updateSense(self, sense, correct=False):
         if isinstance(sense, str):
             self[sense].update(correct)
         else:
@@ -99,7 +109,6 @@ class SenseProfile:
     def __repr__(self):
         return "{}||{}".format(self.name, self.score)
 
-
 class VocabularyProfile:
     def __init__(self):
         # Based on word: wordprofile
@@ -125,21 +134,38 @@ class VocabularyProfile:
         else:
             vocabulary_profile = f
         for word, word_profile in vocabulary_profile.items():
-            self.profile[word] = WordProfile.load_json(word_profile)
+            self.profile[word] = WordProfile.load_json(word_profile, new)
+
+    def words_by_score(self, n=1):
+        # list words in terms of score
+        return self.words(n, lambda x: self[x].n)
+
+
+    def words_by_sense(self, n=1):
+        # list words in terms of score
+        return self.words(n, lambda x: self[x].n)
 
     # Words Lists
-    def words(self, n=1, f=None):
+    def words(self, n=0, f=None):
         result = []
-        i = 0
-        for word in filter(f, self):
-            if i > n: break
-            result.append(word)
-            i += 1
+        i = 1
+        if n == 0:
+            for word in filter(f, self):
+                result.append(word)
+        else:
+            for word in filter(f, self):
+                if i > n: break
+                result.append(word)
+                i += 1
         return result
-    def wordsSeen(self, n=1):
-        return self.words(n, lambda x: self[x].score != 0)
-    def wordsNotSeen(self, n=1):
-        return self.words(n, lambda x: self[x].score == 0)
+    def wordsSeen(self, n=0):
+        return self.words(n, lambda x: self[x].active)
+    def wordsNotSeen(self, n=0):
+        return self.words(n, lambda x: not self[x].active)
+    def wordsMastered(self):
+        return self.words(f=lambda x: self[x].score > 0.7)
+    def wordsNotMastered(self):
+        return self.words(f=lambda x: self[x].score < 0.7 and self[x].active)
     # Representation
     def dict_repr(self):
         result = {}
@@ -159,6 +185,7 @@ class StudentModel:
         self.password = password
         self.vocabulary_profile = VocabularyProfile()
         self.filename = "userfiles/{}-{}-model.txt".format(self.username, self.password)
+        self.cefr = None
 
         if os.path.isfile(self.filename):
             self.load(new=False)
@@ -178,8 +205,10 @@ class StudentModel:
             filename = "userfiles/empty-profile.txt"
         with open(filename, 'r') as f:
             f = json.load(f)
+            self.cefr = f['cefr']
             self.vocabulary_profile.load_json(f, new=new)
         if new:
+            self.cefr = 'A1'
             self.save()
 
     def save(self):
@@ -191,7 +220,8 @@ class StudentModel:
         result = {
             'username': self.username,
             'password': self.password,
-            'vocabulary_profile': self.vocabulary_profile.dict_repr()
+            'cefr': self.cefr,
+            'vocabulary_profile': self.vocabulary_profile.dict_repr(),
         }
         return result
     def __repr__(self):
@@ -209,12 +239,14 @@ class StudentModel:
 
 if __name__ == "__main__":
     s = StudentModel('empty', '0')
-    s.save()
-    s.vocabulary_profile['rage']['rage.n.02'].update(True)
-    s.vocabulary_profile['rage']['rage.n.02'].update(False)
-    s.vocabulary_profile['rage']['rage.n.02'].update(False)
-    s.vocabulary_profile['rage']['rage.n.02'].update(True)
-    s.vocabulary_profile['rage']['rage.n.02'].update(True)
+    d = DomainModel()
+    # s.save()
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=True)
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=False)
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=False)
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=True)
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=False)
+    s.vocabulary_profile['rage'].updateSense('rage.n.02', correct=True)
     print(json.dumps(s.vocabulary_profile['rage'].dict_repr(), indent=4))
 
 

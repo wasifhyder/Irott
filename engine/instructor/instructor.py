@@ -1,11 +1,11 @@
 import random
 from nltk.corpus import wordnet as wn
 # from domain.word_lists import load_word_list
-from ..domain.word_frequency import similar_freq_words
+from engine.domain.word_frequency import similar_freq_words
 # from domain.datamodel import Word
 
-from ..student.filemodel import StudentModel
-from ..domain.filemodel import DomainModel
+from engine.student.filemodel import StudentModel
+from engine.domain.filemodel import DomainModel
 
 """
 The best way to design would be to talk things out. Right now, I'm trying to
@@ -46,16 +46,26 @@ class Instructor:
 
         pass
 
+    def load_words(self):
+    # Loads words according to the user's proficiency
+    # First gets words the user has activated
+        words = self.student_model.wordsSeen()
+        words = list(set(words + self.student_model.wordsNotMastered()))
+    # Filter
+        while len(words) < 50:
+            diff_list = ["A1", "A2", "B1", "B2", "C1", "C2"]
+            ind = diff_list.index(self.student_model.cefr)
+            words = [w for w in self.domain_model if self.domain_model[w].cefr in diff_list[:ind+1]]
+        return words
+
     def quiz(self):
         i = 0
-        words = self.student_model.words()
+        words = self.load_words()
         for word in random.sample(words, self.n):
             q = self.generate_definition_question(word)
             sense = q.sense.name
             correct = q.ask()
-            print(word)
-            print(sense)
-            self.student_model[word][sense].update(correct)
+            self.student_model[word].updateSense(sense, correct)
         self.student_model.save()
 
     def get_quiz(self):
@@ -99,7 +109,8 @@ class Instructor:
         # Todo: Expand the filter to exclude morphological forms
         senses = self.domain_model[word]
         candidates = [sense for sense in senses if word not in sense.definition]
-        sense = random.choice(candidates)
+        if candidates:
+            sense = random.choice(candidates)
         # Generate Question
         # First randomly select a definition
         definition = sense.definition
@@ -141,7 +152,12 @@ class Question:
         for i, choice in enumerate(choices):
             print("[{}]: {}".format(i, choice))
 
-        answer = int(input())
+        while True:
+            answer = int(input())
+            if int(answer) >= 0 and int(answer) < len(choices):
+                break
+            else:
+                print("You selected an invalid option. Try again: ")
         if choices[answer] == self.correct:
             print("That is correct")
             return True
